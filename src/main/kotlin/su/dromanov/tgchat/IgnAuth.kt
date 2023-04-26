@@ -1,4 +1,4 @@
-package org.kraftwerk28.spigot_tg_bridge
+package su.dromanov.tgchat
 
 import java.sql.Connection
 import java.sql.DriverManager

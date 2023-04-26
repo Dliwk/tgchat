@@ -1,4 +1,4 @@
-package org.kraftwerk28.spigot_tg_bridge
+package su.dromanov.tgchat
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runInterruptible
@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.StandardWatchEventKinds
-import org.kraftwerk28.spigot_tg_bridge.Constants as C
+import su.dromanov.tgchat.Constants as C
 
 class Configuration(plugin: Plugin) : YamlConfiguration() {
     val isEnabled: Boolean
@@ -24,6 +24,15 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
     val nobodyOnlineString: String
     val enableIgnAuth: Boolean
     val silentMessages: Boolean?
+
+    val photoString: String
+    val audioString: String
+    val documentString: String
+    val stickerString: String
+    val videoString: String
+    val videoNoteString: String
+    val voiceString: String
+    val pollString: String
 
     // Telegram bot stuff
     val botToken: String
@@ -145,5 +154,14 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
         silentMessages = getBoolean("silentMessages").let { if (!it) null else true }
         apiOrigin = getString("apiOrigin", "https://api.telegram.org")!!
         debugHttp = getBoolean("debugHttp", false)
+
+        photoString = getString("strings.photo", " [photo]")!!
+        audioString = getString("strings.audio", " [audio]")!!
+        documentString = getString("strings.document", " [document]")!!
+        stickerString = getString("strings.sticker", " [sticker]")!!
+        videoString = getString("strings.video", " [video]")!!
+        videoNoteString = getString("strings.videoNote", " [video note]")!!
+        voiceString = getString("strings.voice", " [voice]")!!
+        pollString = getString("strings.poll", " [poll]")!!
     }
 }

@@ -1,4 +1,4 @@
-package org.kraftwerk28.spigot_tg_bridge
+package su.dromanov.tgchat
 
 object Constants {
     const val configFilename = "config.yml"
@@ -20,8 +20,13 @@ object Constants {
     const val USERNAME_PLACEHOLDER = "%username%"
     const val MESSAGE_TEXT_PLACEHOLDER = "%message%"
     const val CHAT_TITLE_PLACEHOLDER = "%chat%"
+    const val MESSAGE_TYPE_PLACEHOLDER = "%type%"
+    const val MESSAGE_TYPE_FILENAME_PLACEHOLDER = "%filename%"
+    const val MESSAGE_TYPE_EMOJI_PLACEHOLDER = "%emoji%"
+    const val MESSAGE_TYPE_DURATION_PLACEHOLDER = "%duration%"
+    const val MESSAGE_TYPE_QUESTION_PLACEHOLDER = "%question%"
     object COMMANDS {
-        const val PLUGIN_RELOAD = "tgbridge_reload"
+        const val PLUGIN_RELOAD = "tgchat_reload"
     }
     object COMMAND_DESC {
         const val timeDesc = "Get time on server"

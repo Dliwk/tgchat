@@ -1,8 +1,8 @@
-package org.kraftwerk28.spigot_tg_bridge
+package su.dromanov.tgchat
 
 import org.bukkit.event.HandlerList
 import java.lang.Exception
-import org.kraftwerk28.spigot_tg_bridge.Constants as C
+import su.dromanov.tgchat.Constants as C
 
 class Plugin : AsyncJavaPlugin() {
     private var tgBot: TgBot? = null
@@ -66,11 +66,15 @@ class Plugin : AsyncJavaPlugin() {
 
     fun sendMessageToMinecraft(
         text: String,
+        type: String? = null,
         username: String? = null,
         chatTitle: String? = null,
     ) = config?.run {
         minecraftFormat
             .replace(C.MESSAGE_TEXT_PLACEHOLDER, text.escapeEmoji())
+            .run {
+                replace(C.MESSAGE_TYPE_PLACEHOLDER, type ?: "")
+            }
             .run {
                 username?.let {
                     replace(C.USERNAME_PLACEHOLDER, it.escapeEmoji())

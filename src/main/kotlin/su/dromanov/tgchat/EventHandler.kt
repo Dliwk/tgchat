@@ -1,4 +1,4 @@
-package org.kraftwerk28.spigot_tg_bridge
+package su.dromanov.tgchat
 
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

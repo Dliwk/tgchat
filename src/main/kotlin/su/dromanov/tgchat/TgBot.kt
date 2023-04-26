@@ -1,4 +1,4 @@
-package org.kraftwerk28.spigot_tg_bridge
+package su.dromanov.tgchat
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -9,8 +9,9 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.lang.StringBuilder
 import java.time.Duration
-import org.kraftwerk28.spigot_tg_bridge.Constants as C
+import su.dromanov.tgchat.Constants as C
 
 typealias CmdHandler = suspend (HandlerContext) -> Unit
 
@@ -89,7 +90,7 @@ class TgBot(
     }
 
     private fun initPolling() = plugin.launch {
-        loop@while (true) {
+        loop@ while (true) {
             try {
                 api.getUpdates(
                     offset = currentOffset,
@@ -132,14 +133,26 @@ class TgBot(
             update.message,
             update.message?.chat,
         )
-        update.message?.text?.let {
-            commandRegex?.matchEntire(it)?.groupValues?.let { matchList ->
-                commandMap[matchList[1]]?.run {
-                    val args = matchList[2].split("\\s+".toRegex())
-                    this(ctx.copy(commandArgs = args))
+//        update.message?.text?.let {
+//            commandRegex?.matchEntire(it)?.groupValues?.let { matchList ->
+//                commandMap[matchList[1]]?.run {
+//                    val args = matchList[2].split("\\s+".toRegex())
+//                    this(ctx.copy(commandArgs = args))
+//                }
+//            } ?: run {
+//                onMessageHandler(ctx)
+//            }
+//        }
+        update.message?.let {
+            it.text?.let {
+                commandRegex?.matchEntire(it)?.groupValues?.let { matchList ->
+                    commandMap[matchList[1]]?.run {
+                        val args = matchList[2].split("\\s+".toRegex())
+                        this(ctx.copy(commandArgs = args))
+                    }
                 }
             } ?: run {
-                onTextHandler(ctx)
+                onMessageHandler(ctx)
             }
         }
     }
@@ -231,21 +244,64 @@ class TgBot(
             api.sendMessage(ctx.message!!.chat.id, "No linked users.")
         } else {
             val text = "<b>Linked users:</b>\n" +
-                linkedUsers.mapIndexed { i, dbUser ->
-                    "${i + 1}. ${dbUser.fullName()}"
-                }.joinToString("\n")
+                    linkedUsers.mapIndexed { i, dbUser ->
+                        "${i + 1}. ${dbUser.fullName()}"
+                    }.joinToString("\n")
             api.sendMessage(ctx.message!!.chat.id, text)
         }
     }
 
-    private fun onTextHandler(
-        @Suppress("unused_parameter") ctx: HandlerContext
-    ) {
+    private fun onMessageHandler(ctx: HandlerContext) {
         val msg = ctx.message!!
         if (!config.logFromTGtoMC || msg.from == null)
             return
         plugin.sendMessageToMinecraft(
-            text = msg.text!!,
+            text = msg.text ?: msg.caption ?: "",
+            type = msg.run {
+                photo?.let { config.photoString }
+                    ?: audio?.let {
+                        config.audioString.replace(
+                            C.MESSAGE_TYPE_FILENAME_PLACEHOLDER,
+                            it.fileName ?: "<n/a>"
+                        )
+                    }
+                    ?: document?.let {
+                        config.documentString.replace(
+                            C.MESSAGE_TYPE_FILENAME_PLACEHOLDER,
+                            it.fileName ?: "<n/a>"
+                        )
+                    }
+                    ?: sticker?.let {
+                        config.stickerString.replace(
+                            C.MESSAGE_TYPE_EMOJI_PLACEHOLDER,
+                            it.emoji.escapeEmoji()
+                        )
+                    }
+                    ?: video?.let {
+                        config.videoString.replace(
+                            C.MESSAGE_TYPE_FILENAME_PLACEHOLDER,
+                            it.fileName ?: "<n/a>"
+                        )
+                    }
+                    ?: videoNote?.let {
+                        config.videoNoteString.replace(
+                            C.MESSAGE_TYPE_DURATION_PLACEHOLDER,
+                            String.format("%ss", it.duration)
+                        )
+                    }
+                    ?: voice?.let {
+                        config.voiceString.replace(
+                            C.MESSAGE_TYPE_DURATION_PLACEHOLDER,
+                            String.format("%ss", it.duration)
+                        )
+                    }
+                    ?: poll?.let {
+                        config.pollString.replace(
+                            C.MESSAGE_TYPE_QUESTION_PLACEHOLDER,
+                            it.question
+                        )
+                    }
+            },
             username = msg.from.rawUserMention(),
             chatTitle = msg.chat.title,
         )

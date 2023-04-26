@@ -8,14 +8,23 @@ logFromMCtoTG: true
 logFromTGtoMC: true
 logPlayerDeath: true
 logPlayerAsleep: false
-minecraftFormat: "§6§l%username%§r (from §o%chat%§r): §b%message%§r"
-telegramFormat: "<i>%username%</i>: %message%"
+minecraftFormat: "(§o%chat%§r) §6§l%username%§r:§l§6%type%§r §b%message%§r"
+telegramFormat: "<b>%username%</b>: %message%"
 silentMessages: false
 strings:
   online: "<b>Online</b>"
   nobodyOnline: "<b>Nobody online...</b>"
   joined: "<i>%username%</i> joined."
   left: "<i>%username%</i> left."
+
+  photo: " [photo]"
+  audio: " [audio %filename%]"
+  document: " [document %filename%]"
+  sticker: " [sticker %emoji%]"
+  video: " [video %filename%]"
+  videoNote: " [video note %duration%]"
+  voice: " [voice]"
+  poll: " [poll %question%]"
 commands:
   time: "time"
   online: "online"
