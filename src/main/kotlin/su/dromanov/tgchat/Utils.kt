@@ -25,9 +25,8 @@ fun String.fullEscape() = escapeHTML().escapeColorCodes()
 fun String.escapeEmoji() = EmojiParser.parseToAliases(this)
 
 fun User.rawUserMention(): String =
-    (if (firstName.length < 2) null else firstName)
-        ?: username
-        ?: lastName!!
+    lastName?.let { String.format("%s %s", firstName, lastName) }
+        ?: firstName
 
 fun DbLinkedUser.fullName() = tgFirstName + (tgLastName?.let { " $it" } ?: "")
 
