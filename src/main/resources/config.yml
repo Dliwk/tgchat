@@ -1,5 +1,5 @@
 enable: true
-botToken: abcdef123456789
+botToken: 123456:abcdef
 chats: []
 serverStartMessage: "Server started."
 serverStopMessage: "Server stopped."
@@ -8,7 +8,9 @@ logFromMCtoTG: true
 logFromTGtoMC: true
 logPlayerDeath: true
 logPlayerAsleep: false
-minecraftFormat: "(§o%chat%§r) §6§l%username%§r:§l§6%type%§r §b%message%§r"
+minecraftFormat: "%reply%(§l§d%chat%§r) §6§l%username%§r:§l§6%type%§r %message%§r"
+replyToMessageFormat: "(§l§d%chat%§r) §a§o>§l%type%§r§a§o %message%§r - §6%username%§r\n"
+
 telegramFormat: "<b>%username%</b>: %message%"
 silentMessages: false
 strings:
@@ -18,13 +20,13 @@ strings:
   left: "<i>%username%</i> left."
 
   photo: " [photo]"
-  audio: " [audio %filename%]"
-  document: " [document %filename%]"
-  sticker: " [sticker %emoji%]"
-  video: " [video %filename%]"
-  videoNote: " [video note %duration%]"
-  voice: " [voice]"
-  poll: " [poll %question%]"
+  audio: " [audio: %filename%]"
+  document: " [document: %filename%]"
+  sticker: " [sticker: %emoji%]"
+  video: " [video: %filename%]"
+  videoNote: " [video note: %duration%s]"
+  voice: " [voice: %duration%s]"
+  poll: " [poll: %question%]"
 commands:
   time: "time"
   online: "online"

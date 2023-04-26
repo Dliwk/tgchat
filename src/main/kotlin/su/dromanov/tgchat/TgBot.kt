@@ -257,51 +257,8 @@ class TgBot(
             return
         plugin.sendMessageToMinecraft(
             text = msg.text ?: msg.caption ?: "",
-            type = msg.run {
-                photo?.let { config.photoString }
-                    ?: audio?.let {
-                        config.audioString.replace(
-                            C.MESSAGE_TYPE_FILENAME_PLACEHOLDER,
-                            it.fileName ?: "<n/a>"
-                        )
-                    }
-                    ?: document?.let {
-                        config.documentString.replace(
-                            C.MESSAGE_TYPE_FILENAME_PLACEHOLDER,
-                            it.fileName ?: "<n/a>"
-                        )
-                    }
-                    ?: sticker?.let {
-                        config.stickerString.replace(
-                            C.MESSAGE_TYPE_EMOJI_PLACEHOLDER,
-                            it.emoji.escapeEmoji()
-                        )
-                    }
-                    ?: video?.let {
-                        config.videoString.replace(
-                            C.MESSAGE_TYPE_FILENAME_PLACEHOLDER,
-                            it.fileName ?: "<n/a>"
-                        )
-                    }
-                    ?: videoNote?.let {
-                        config.videoNoteString.replace(
-                            C.MESSAGE_TYPE_DURATION_PLACEHOLDER,
-                            String.format("%ss", it.duration)
-                        )
-                    }
-                    ?: voice?.let {
-                        config.voiceString.replace(
-                            C.MESSAGE_TYPE_DURATION_PLACEHOLDER,
-                            String.format("%ss", it.duration)
-                        )
-                    }
-                    ?: poll?.let {
-                        config.pollString.replace(
-                            C.MESSAGE_TYPE_QUESTION_PLACEHOLDER,
-                            it.question
-                        )
-                    }
-            },
+            replyToMessage = msg.replyToMessage,
+            type = plugin.getTypeString(msg),
             username = msg.from.rawUserMention(),
             chatTitle = msg.chat.title,
         )

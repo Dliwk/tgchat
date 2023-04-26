@@ -13,6 +13,7 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
     val logFromMCtoTG: Boolean
     val telegramFormat: String
     val minecraftFormat: String
+    val replyToMessageFormat: String
     val serverStartMessage: String?
     val serverStopMessage: String?
     val logJoinLeave: Boolean
@@ -125,6 +126,10 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
         minecraftFormat = getString(
             "minecraftFormat",
             "<%username%>: %message%",
+        )!!
+        replyToMessageFormat = getString(
+            "replyToMessageFormat",
+            "> %username%: %message%\n",
         )!!
         // isEnabled = getBoolean("enable", true)
         allowedChats = getLongList("chats")

@@ -25,6 +25,7 @@ object Constants {
     const val MESSAGE_TYPE_EMOJI_PLACEHOLDER = "%emoji%"
     const val MESSAGE_TYPE_DURATION_PLACEHOLDER = "%duration%"
     const val MESSAGE_TYPE_QUESTION_PLACEHOLDER = "%question%"
+    const val MESSAGE_REPLY_TO_PLACEHOLDER = "%reply%"
     object COMMANDS {
         const val PLUGIN_RELOAD = "tgchat_reload"
     }
