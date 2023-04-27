@@ -19,6 +19,13 @@ interface TgApiService {
         @Query("disable_notification") disableNotification: Boolean? = null,
     ): TgResponse<Message>
 
+    @GET("editMessageText?parse_mode=HTML")
+    suspend fun editMessage(
+        @Query("chat_id") chatId: Long,
+        @Query("message_id") messageId: Long,
+        @Query("text") text: String,
+    ): TgResponse<Message>
+
     @GET("getUpdates")
     suspend fun getUpdates(
         @Query("offset") offset: Long,

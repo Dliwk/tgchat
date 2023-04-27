@@ -1,6 +1,9 @@
 enable: true
-botToken: 123456:abcdef
-chats: []
+botToken: 5765557544:AAH601OuRn1yALdKQtweFCwGsLGjFIOKRuU
+chats:
+  - -913230405
+admins:
+  - 745877010
 serverStartMessage: "✅Сервер запущен."
 serverStopMessage: "⛔️Сервер выключен."
 logJoinLeave: true
@@ -9,7 +12,7 @@ logFromTGtoMC: true
 logPlayerDeath: true
 logPlayerAsleep: false
 minecraftFormat: "%reply%(§l§d%chat%§r) §6§l%username%§r:§l§6%type%§r %message%§r"
-replyToMessageFormat: "(§l§d%chat%§r) §a§o>§l%type%§r§a§o %message%§r - §6%username%§r\n"
+replyToMessageFormat: "(§l§d%chat%§r) §a§o>§l%type%§r§a§o %message% - %username%§r\n"
 
 telegramFormat: "<b>%username%</b>: %message%"
 silentMessages: false
@@ -28,6 +31,9 @@ strings:
   videoNote: " [видеосообщение %duration%s]"
   voice: " [голосовое сообщение %duration%s]"
   poll: " [опрос: %question%]"
+
+  commandRunning: "Выполняем команду <code>%command%</code>..."
+  commandResultLine: "\n<pre>%result%</pre>"
 
   advancement:
     "story/root": "Minecraft"
@@ -132,3 +138,4 @@ commands:
   time: "time"
   online: "online"
   chat_id: "chat_id"
+  cmd: "cmd"

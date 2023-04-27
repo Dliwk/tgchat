@@ -33,5 +33,6 @@ object Constants {
         const val timeDesc = "Get time on server"
         const val onlineDesc = "Get players online"
         const val chatIDDesc = "Get current chat id"
+        const val cmdDesc = "Run minecraft command"
     }
 }

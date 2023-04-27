@@ -6,6 +6,7 @@ class BotCommands(cfg: FileConfiguration) {
     val time: String?
     val online: String?
     val chatID: String?
+    val cmd: String?
     val linkIgn: String?
     val getAllLinked: String?
 
@@ -14,6 +15,7 @@ class BotCommands(cfg: FileConfiguration) {
             time = getString("commands.time")
             online = getString("commands.online")
             chatID = getString("commands.chat_id")
+            cmd = getString("commands.cmd")
             linkIgn = getString("commands.link_ign")
             getAllLinked = getString("commands.list_linked")
         }

@@ -26,6 +26,8 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
     val nobodyOnlineString: String
     val enableIgnAuth: Boolean
     val silentMessages: Boolean?
+    val commandRunningString: String
+    val commandResultLine: String
 
     val photoString: String
     val audioString: String
@@ -39,6 +41,7 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
     // Telegram bot stuff
     val botToken: String
     val allowedChats: List<Long>
+    val chatAdmins: List<Long>
     val logFromTGtoMC: Boolean
     val allowWebhook: Boolean
     val webhookConfig: Map<String, Any>?
@@ -138,6 +141,7 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
         )!!
         // isEnabled = getBoolean("enable", true)
         allowedChats = getLongList("chats")
+        chatAdmins = getLongList("admins")
         enableIgnAuth = getBoolean("enableIgnAuth", false)
 
         botToken = getString("botToken") ?: throw Exception(C.WARN.noToken)
@@ -156,6 +160,8 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
             "strings.joined",
             "<i>%username%</i> joined.",
         )!!
+        commandRunningString = getString("strings.commandRunning", "running /%cmd%:")!!
+        commandResultLine = getString("strings.commandResultLine", "%result%")!!
         leaveString = getString("strings.left", "<i>%username%</i> left.")!!
         logDeath = getBoolean("logPlayerDeath", false)
         logPlayerAsleep = getBoolean("logPlayerAsleep", false)

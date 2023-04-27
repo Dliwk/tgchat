@@ -1,15 +1,20 @@
 package su.dromanov.tgchat
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
+import net.md_5.bungee.api.chat.BaseComponent
 import okhttp3.OkHttpClient
+import okhttp3.internal.wait
 import okhttp3.logging.HttpLoggingInterceptor
+import org.bukkit.Bukkit
+import org.bukkit.Server
+import org.bukkit.command.CommandSender
+import org.bukkit.permissions.Permission
+import org.bukkit.permissions.PermissionAttachment
+import org.bukkit.permissions.PermissionAttachmentInfo
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.lang.StringBuilder
 import java.time.Duration
 import su.dromanov.tgchat.Constants as C
 
@@ -21,6 +26,101 @@ data class HandlerContext(
     val chat: Chat?,
     val commandArgs: List<String> = listOf(),
 )
+
+class TgCommandSender(
+    private val name: String,
+    private val onReply: ((Array<out String>) -> Unit)
+) : CommandSender {
+    override fun isOp(): Boolean {
+        return true
+    }
+
+    override fun setOp(value: Boolean) {
+        TODO("Not implemented")
+    }
+
+    override fun isPermissionSet(name: String): Boolean {
+        return true
+    }
+
+    override fun isPermissionSet(perm: Permission): Boolean {
+        return true
+    }
+
+    override fun hasPermission(name: String): Boolean {
+        return true
+    }
+
+    override fun hasPermission(perm: Permission): Boolean {
+        return true
+    }
+
+    override fun addAttachment(plugin: org.bukkit.plugin.Plugin, name: String, value: Boolean): PermissionAttachment {
+        TODO("Not implemented")
+    }
+
+    override fun addAttachment(plugin: org.bukkit.plugin.Plugin): PermissionAttachment {
+        TODO("Not implemented")
+    }
+
+    override fun addAttachment(
+        plugin: org.bukkit.plugin.Plugin,
+        name: String,
+        value: Boolean,
+        ticks: Int
+    ): PermissionAttachment? {
+        TODO("Not implemented")
+    }
+
+    override fun addAttachment(plugin: org.bukkit.plugin.Plugin, ticks: Int): PermissionAttachment? {
+        TODO("Not implemented")
+    }
+
+    override fun removeAttachment(attachment: PermissionAttachment) {
+        TODO("Not implemented")
+    }
+
+    override fun recalculatePermissions() {
+        TODO("Not implemented")
+    }
+
+    override fun getEffectivePermissions(): MutableSet<PermissionAttachmentInfo> {
+        TODO("Not implemented")
+    }
+
+    override fun sendMessage(message: String) {
+        onReply.invoke(arrayOf(message))
+    }
+
+    override fun sendMessage(messages: Array<out String>) {
+        onReply.invoke(messages)
+    }
+
+    override fun getServer(): Server {
+        return Bukkit.getServer()
+    }
+
+    override fun getName(): String {
+        return name
+    }
+
+    override fun spigot(): CommandSender.Spigot {
+        return object : CommandSender.Spigot() {
+            override fun sendMessage(component: BaseComponent) {
+                onReply.invoke(arrayOf(component.toPlainText()))
+            }
+
+            override fun sendMessage(vararg components: BaseComponent?) {
+                val builder = StringBuilder()
+                for (component in components) {
+                    component?.run { builder.append(toPlainText()) }
+                }
+                onReply.invoke(arrayOf(builder.toString()))
+            }
+        }
+    }
+
+}
 
 class TgBot(
     private val plugin: Plugin,
@@ -55,6 +155,7 @@ class TgBot(
             online to ::onlineHandler,
             time to ::timeHandler,
             chatID to ::chatIdHandler,
+            cmd to ::cmdHandler
             // TODO:
             // linkIgn to ::linkIgnHandler,
             // getAllLinked to ::getLinkedUsersHandler,
@@ -63,13 +164,11 @@ class TgBot(
 
     private suspend fun initialize() {
         me = api.getMe().result!!
-        // I intentionally don't put optional @username in regex
-        // since bot is only used in group chats
-        commandRegex = """^/(\w+)@${me!!.username}(?:\s+(.+))?$""".toRegex()
-        val commands = config.commands.run { listOf(time, online, chatID) }
+        commandRegex = """^/(\w+)(@${me!!.username})?(?:\s+(.+))?$""".toRegex()
+        val commands = config.commands.run { listOf(time, online, chatID, cmd) }
             .zip(
                 C.COMMAND_DESC.run {
-                    listOf(timeDesc, onlineDesc, chatIDDesc)
+                    listOf(timeDesc, onlineDesc, chatIDDesc, cmdDesc)
                 }
             )
             .map { BotCommand(it.first!!, it.second) }
@@ -133,16 +232,6 @@ class TgBot(
             update.message,
             update.message?.chat,
         )
-//        update.message?.text?.let {
-//            commandRegex?.matchEntire(it)?.groupValues?.let { matchList ->
-//                commandMap[matchList[1]]?.run {
-//                    val args = matchList[2].split("\\s+".toRegex())
-//                    this(ctx.copy(commandArgs = args))
-//                }
-//            } ?: run {
-//                onMessageHandler(ctx)
-//            }
-//        }
         update.message?.let {
             it.text?.let {
                 commandRegex?.matchEntire(it)?.groupValues?.let { matchList ->
@@ -212,8 +301,52 @@ class TgBot(
         |  # other chat ids...
         |]
         |</pre>
+        |Your user id: <code>${msg.from?.id}</code>
         """.trimMargin()
         api.sendMessage(chatId, text, replyToMessageId = msg.messageId)
+    }
+
+    private suspend fun cmdHandler(ctx: HandlerContext) {
+        val msg = ctx.message!!
+        val chatId = msg.chat.id
+        if (!config.allowedChats.contains(msg.chat.id)) {
+            return
+        }
+        if (msg.text == null) {
+            return
+        }
+        if (msg.from?.id !in config.chatAdmins) {
+            api.sendMessage(chatId, "Недоступно.", replyToMessageId = msg.messageId)
+            return
+        }
+        val cmd = msg.text.split(" ", limit = 2).getOrNull(1)
+        if (cmd == null) {
+            api.sendMessage(chatId, "Требуется команда для выполнения.", replyToMessageId = msg.messageId)
+            return
+        }
+
+
+        var sentText = config.commandRunningString.replace("%command%", cmd)
+        var sent = api.sendMessage(
+            chatId,
+            sentText,
+            replyToMessageId = msg.messageId
+        ).result!!
+
+        TgCommandSender("(tg) ${msg.from!!.rawUserMention()}") { s ->
+            val text = config.commandResultLine
+                .replace("%result%", s.joinToString("\n").escapeColorCodes().escapeHtml())
+
+            sentText += text
+
+            runBlocking {
+                sent = api.editMessage(chatId, sent.messageId, sentText).result!!
+            }
+        }.let {
+            Bukkit.getScheduler().callSyncMethod(plugin) {
+                plugin.server.dispatchCommand(it, "$cmd")
+            }
+        }
     }
 
     private suspend fun linkIgnHandler(ctx: HandlerContext) {
