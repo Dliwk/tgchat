@@ -7,6 +7,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerAdvancementDoneEvent
 
 class EventHandler(
     private val plugin: Plugin,
@@ -19,6 +20,17 @@ class EventHandler(
         if (!config.logFromMCtoTG || event.isCancelled) return
         event.run {
             sendMessage(message, player.displayName)
+        }
+    }
+
+    @EventHandler
+    fun onPlayerAdvancementDone(event: PlayerAdvancementDoneEvent) {
+        event.advancement.key.key.let { adv ->
+            config.getString("strings.advancement.$adv")?.let {
+                sendMessage(config.advancementDoneFormat
+                    .replace("%player%", event.player.displayName)
+                    .replace("%advancement%", it))
+            }
         }
     }
 

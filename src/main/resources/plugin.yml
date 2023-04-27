@@ -1,4 +1,4 @@
-name: SpigotTGBridge
+name: TgChat
 version: "0.20.1"
 api-version: "1.15"
 main: su.dromanov.tgchat.Plugin

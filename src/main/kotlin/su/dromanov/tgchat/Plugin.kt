@@ -128,7 +128,7 @@ class Plugin : AsyncJavaPlugin() {
                         .replace(C.MESSAGE_TYPE_PLACEHOLDER, getTypeString(it) ?: "")
                         .replace(C.CHAT_TITLE_PLACEHOLDER, it.chat.title ?: "<unknown chat>")
                         .replace(C.USERNAME_PLACEHOLDER, it.from?.rawUserMention() ?: "<unknown user>")
-                        .replace(C.MESSAGE_TEXT_PLACEHOLDER, it.text ?: it.caption ?: "")
+                        .replace(C.MESSAGE_TEXT_PLACEHOLDER, (it.text ?: it.caption ?: "").escapeEmoji())
                 } ?: "")
             }
             .run {

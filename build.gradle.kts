@@ -21,7 +21,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
 }
 
-group = "org.kraftwerk28"
+group = "su.dromanov"
 
 val cfg: Map<String, String> = Yaml()
     .load(FileInputStream("$projectDir/src/main/resources/plugin.yml"))
@@ -55,21 +55,8 @@ defaultTasks("shadowJar")
 tasks {
     named<ShadowJar>("shadowJar") {
         archiveFileName.set(
-            "spigot-tg-bridge-$spigotApiVersion-v$pluginVersion.jar"
+            "tgchat-$spigotApiVersion-v$pluginVersion.jar"
         )
-    }
-    register<Copy>("copyArtifacts") {
-        val dest = File(
-            System.getenv("HOME"),
-            "projects/minecraft/spigot/spigot-1.18.1/plugins",
-        )
-        from(shadowJar)
-        into(dest)
-    }
-    register("pack") {
-        description = "[For development only!] Build project and copy .jar into servers directory"
-        dependsOn("shadowJar")
-        finalizedBy("copyArtifacts")
     }
     withType<KotlinCompile> {
         kotlinOptions {

@@ -14,6 +14,7 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
     val telegramFormat: String
     val minecraftFormat: String
     val replyToMessageFormat: String
+    val advancementDoneFormat: String
     val serverStartMessage: String?
     val serverStopMessage: String?
     val logJoinLeave: Boolean
@@ -130,6 +131,10 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
         replyToMessageFormat = getString(
             "replyToMessageFormat",
             "> %username%: %message%\n",
+        )!!
+        advancementDoneFormat = getString(
+            "strings.advancementDone",
+            "%player% has finished %advancement%!"
         )!!
         // isEnabled = getBoolean("enable", true)
         allowedChats = getLongList("chats")
