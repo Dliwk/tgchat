@@ -28,6 +28,7 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
     val silentMessages: Boolean?
     val commandRunningString: String
     val commandResultLine: String
+    val commandNoOutput: String
 
     val photoString: String
     val audioString: String
@@ -162,6 +163,7 @@ class Configuration(plugin: Plugin) : YamlConfiguration() {
         )!!
         commandRunningString = getString("strings.commandRunning", "running /%cmd%:")!!
         commandResultLine = getString("strings.commandResultLine", "%result%")!!
+        commandNoOutput = getString("strings.commandNoOutput", "(empty)")!!
         leaveString = getString("strings.left", "<i>%username%</i> left.")!!
         logDeath = getBoolean("logPlayerDeath", false)
         logPlayerAsleep = getBoolean("logPlayerAsleep", false)

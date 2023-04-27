@@ -4,6 +4,7 @@ chats:
   - -913230405
 admins:
   - 745877010
+  - 308148194
 serverStartMessage: "✅Сервер запущен."
 serverStopMessage: "⛔️Сервер выключен."
 logJoinLeave: true
@@ -34,6 +35,7 @@ strings:
 
   commandRunning: "Выполняем команду <code>%command%</code>..."
   commandResultLine: "\n<pre>%result%</pre>"
+  commandNoOutput: " (пустой вывод)"
 
   advancement:
     "story/root": "Minecraft"

@@ -9,7 +9,13 @@ import okhttp3.internal.wait
 import okhttp3.logging.HttpLoggingInterceptor
 import org.bukkit.Bukkit
 import org.bukkit.Server
+import org.bukkit.command.CommandException
 import org.bukkit.command.CommandSender
+import org.bukkit.command.ConsoleCommandSender
+import org.bukkit.command.RemoteConsoleCommandSender
+import org.bukkit.conversations.Conversable
+import org.bukkit.conversations.Conversation
+import org.bukkit.conversations.ConversationAbandonedEvent
 import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionAttachment
 import org.bukkit.permissions.PermissionAttachmentInfo
@@ -30,14 +36,12 @@ data class HandlerContext(
 class TgCommandSender(
     private val name: String,
     private val onReply: ((Array<out String>) -> Unit)
-) : CommandSender {
+) : RemoteConsoleCommandSender {
     override fun isOp(): Boolean {
         return true
     }
 
-    override fun setOp(value: Boolean) {
-        TODO("Not implemented")
-    }
+    override fun setOp(value: Boolean) {}
 
     override fun isPermissionSet(name: String): Boolean {
         return true
@@ -69,20 +73,16 @@ class TgCommandSender(
         value: Boolean,
         ticks: Int
     ): PermissionAttachment? {
-        TODO("Not implemented")
+        return null
     }
 
     override fun addAttachment(plugin: org.bukkit.plugin.Plugin, ticks: Int): PermissionAttachment? {
-        TODO("Not implemented")
+        return null
     }
 
-    override fun removeAttachment(attachment: PermissionAttachment) {
-        TODO("Not implemented")
-    }
+    override fun removeAttachment(attachment: PermissionAttachment) {}
 
-    override fun recalculatePermissions() {
-        TODO("Not implemented")
-    }
+    override fun recalculatePermissions() {}
 
     override fun getEffectivePermissions(): MutableSet<PermissionAttachmentInfo> {
         TODO("Not implemented")
@@ -119,7 +119,6 @@ class TgCommandSender(
             }
         }
     }
-
 }
 
 class TgBot(
@@ -325,7 +324,6 @@ class TgBot(
             return
         }
 
-
         var sentText = config.commandRunningString.replace("%command%", cmd)
         var sent = api.sendMessage(
             chatId,
@@ -338,13 +336,23 @@ class TgBot(
                 .replace("%result%", s.joinToString("\n").escapeColorCodes().escapeHtml())
 
             sentText += text
-
             runBlocking {
                 sent = api.editMessage(chatId, sent.messageId, sentText).result!!
             }
         }.let {
             Bukkit.getScheduler().callSyncMethod(plugin) {
-                plugin.server.dispatchCommand(it, "$cmd")
+                try {
+                    plugin.server.dispatchCommand(it, cmd)
+                } catch (e: CommandException) {
+                    plugin.server.run {
+                        dispatchCommand(consoleSender, cmd)
+                    }
+//                    sentText += config.commandNoOutput
+                    sentText += "\n<pre>${e.stackTraceToString()}</pre>"
+                    runBlocking {
+                        sent = api.editMessage(chatId, sent.messageId, sentText).result!!
+                    }
+                }
             }
         }
     }
